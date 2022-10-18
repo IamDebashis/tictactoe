@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="appHeadline" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">@font/roboto_condensed_bold</item>
+        <item name="android:textSize">50sp</item>
+    </style>
+
+    <style name="circleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+
+    <style name="dialoge" parent="Theme.MaterialComponents.Dialog.Alert.Bridge">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+</resources>
