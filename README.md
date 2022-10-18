@@ -5,7 +5,7 @@ This a very fun TicTacToe game to play with your friends.
 you can play multiplayer. It has a very cool looking ui and you will love you interact with it.
 You can also save same, for latter play.
 
-[app demo](https://github.com/IamDebashis/tictactoe/blob/master/screenshorts/device-2022-10-18-212716.gif)
+![](https://github.com/IamDebashis/tictactoe/blob/master/screenshorts/device-2022-10-18-212716.gif)
 
 
 
