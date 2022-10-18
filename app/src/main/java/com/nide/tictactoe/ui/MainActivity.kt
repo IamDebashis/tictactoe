@@ -1,7 +1,8 @@
-package com.nide.tictactoe
+package com.nide.tictactoe.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.nide.tictactoe.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

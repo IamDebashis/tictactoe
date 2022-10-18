@@ -5,8 +5,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.media.MediaPlayer
-import android.os.Parcelable
-import android.text.BoringLayout
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -19,9 +17,7 @@ import com.nide.tictactoe.R
 import com.nide.tictactoe.logic.TicTacToeGame
 import com.nide.tictactoe.util.SaveUtil
 import com.nide.tictactoe.util.gameSaveData
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.ceil
@@ -295,17 +291,17 @@ class TicTacToeBoard @JvmOverloads constructor(
 
 
     fun test() {
-    /*    game.gameBoard.forEach {
-            Log.i(TAG, "test: ${it.contentToString()}")
-        }
-        Log.i(TAG, "test: full ${game.gameBoard.contentDeepToString()}")
+        /*    game.gameBoard.forEach {
+                Log.i(TAG, "test: ${it.contentToString()}")
+            }
+            Log.i(TAG, "test: full ${game.gameBoard.contentDeepToString()}")
 
-        val g = Gson()
-        var s = g.toJson(game.gameBoard)
+            val g = Gson()
+            var s = g.toJson(game.gameBoard)
 
-        Log.i(TAG, "test: gson $s")
-        val x = g.fromJson(s, Array(3) { IntArray(3) }.javaClass)
-        Log.i(TAG, "test: retive ${x.contentDeepToString()}")*/
+            Log.i(TAG, "test: gson $s")
+            val x = g.fromJson(s, Array(3) { IntArray(3) }.javaClass)
+            Log.i(TAG, "test: retive ${x.contentDeepToString()}")*/
     }
 
     private suspend fun loadData() {
@@ -313,13 +309,31 @@ class TicTacToeBoard @JvmOverloads constructor(
             pref[SaveUtil.isGameSave_key] ?: false
         }
 
-        isGameSave.collect{
-            Log.i(TAG, "loadData: state $it")
-            if (it) {
+        isGameSave.collect { save ->
+            Log.i(TAG, "loadData: state $save")
+            if (save) {
                 val data = context.gameSaveData.data.map { pref ->
                     pref[SaveUtil.gameData_key] ?: ""
                 }
-                data.collectLatest { matrix ->
+                val currentPlayer = context.gameSaveData.data.map { pref ->
+                    pref[SaveUtil.currentPlayer_key] ?: 1
+                }
+                val score = context.gameSaveData.data.map { pref ->
+                    pref[SaveUtil.gameScore_key] ?: ""
+                }
+
+                currentPlayer.first().let { player ->
+                    game.player = player
+                    onPlayerChangeListener?.invoke(player)
+                }
+                score.first().let { ss ->
+                    val gson = Gson()
+                    val tscore = gson.fromJson(ss, IntArray(2).javaClass)
+                    game.gameScore = tscore
+                    game.onGameScoreUp?.invoke(game.gameScore)
+                }
+
+                data.first().let { matrix ->
                     if (matrix.isNotEmpty()) {
                         val gson = Gson()
                         try {
@@ -328,23 +342,36 @@ class TicTacToeBoard @JvmOverloads constructor(
                             game.gameBoard = boardData
                         } catch (e: Exception) {
                             Log.e(TAG, "loadData: $e")
-                        }finally {
+                        } finally {
                             saveGame(false)
                         }
                     }
                 }
+
             }
         }
 
     }
 
-    suspend fun saveGame(state: Boolean) {
+    suspend fun saveGame(
+        state: Boolean,
+        player1: String = "",
+        player2: String = "",
+    ) {
         context.gameSaveData.edit { setting ->
             setting[SaveUtil.isGameSave_key] = state
-            val gson = Gson()
-            val data = gson.toJson(game.gameBoard)
-            Log.i(TAG, "saveGame: $data")
-            setting[SaveUtil.gameData_key] = data
+            if (state) {
+                setting[SaveUtil.player1_key] = player1
+                setting[SaveUtil.player2_key] = player2
+                setting[SaveUtil.currentPlayer_key] = game.player
+                val gson = Gson()
+                val data = gson.toJson(game.gameBoard)
+                setting[SaveUtil.gameData_key] = data
+                val score = gson.toJson(game.gameScore)
+                setting[SaveUtil.gameScore_key] = score
+                Log.i(TAG, "saveGame: $data")
+
+            }
         }
     }
 

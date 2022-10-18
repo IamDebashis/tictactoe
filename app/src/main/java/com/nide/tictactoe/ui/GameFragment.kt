@@ -3,21 +3,19 @@ package com.nide.tictactoe.ui
 import android.app.Dialog
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import com.nide.tictactoe.R
-import com.nide.tictactoe.databinding.DrawDialougeLayoutBinding
 import com.nide.tictactoe.databinding.FragmentGameBinding
 import com.nide.tictactoe.util.collectFlow
 import kotlinx.coroutines.delay
@@ -25,7 +23,6 @@ import kotlinx.coroutines.runBlocking
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
-import nl.dionsegijn.konfetti.xml.KonfettiView
 import java.util.concurrent.TimeUnit
 
 
@@ -37,11 +34,23 @@ class GameFragment : Fragment() {
     private val viewModel by viewModels<GameViewModel>()
 
     private val args: GameFragmentArgs by navArgs()
-    val player = MediaPlayer()
     override fun onDestroy() {
         super.onDestroy()
 
         _binding = null
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                lifecycleScope.launchWhenStarted {
+                    leaveDialog()
+                }
+            }
+        })
+
     }
 
 
@@ -140,72 +149,70 @@ class GameFragment : Fragment() {
 
     private suspend fun drawDialoug() {
         delay(600)
-        val dialouge = Dialog(requireContext(), R.style.dialoge)
-        dialouge.setContentView(R.layout.draw_dialouge_layout)
-        dialouge.window?.setLayout(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        val btnHome = dialouge.findViewById<Button>(R.id.btn_home)
-        val btn_rePlay = dialouge.findViewById<Button>(R.id.btn_play)
-        dialouge.setCancelable(false)
+        val dialog = Dialog(requireContext(), R.style.dialoge)
+        dialog.setContentView(R.layout.draw_dialouge_layout)
+        val btnHome = dialog.findViewById<Button>(R.id.btn_home)
+        val btnReplay = dialog.findViewById<Button>(R.id.btn_play)
+        dialog.setCancelable(false)
         btnHome.setOnClickListener {
-            dialouge.dismiss()
+            dialog.dismiss()
             findNavController().navigate(R.id.action_gameFragment_to_homeScreenFragment)
         }
-        btn_rePlay.setOnClickListener {
-            dialouge.dismiss()
+        btnReplay.setOnClickListener {
+            dialog.dismiss()
             binding.btnRestart.callOnClick()
         }
 
-        dialouge.show()
+        dialog.show()
 
     }
 
     private suspend fun winDialog(name: String) {
         delay(600)
-        val dialouge = Dialog(requireContext(), R.style.dialoge)
-        dialouge.setContentView(R.layout.win_dialog_layout)
-        dialouge.setCancelable(false)
-        val btnHome = dialouge.findViewById<Button>(R.id.btn_home)
-        val btn_rePlay = dialouge.findViewById<Button>(R.id.btn_play)
-        val playerName = dialouge.findViewById<TextView>(R.id.tv_player_name)
-
+        val dialog = Dialog(requireContext(), R.style.dialoge)
+        dialog.setContentView(R.layout.win_dialog_layout)
+        dialog.setCancelable(false)
+        val btnHome = dialog.findViewById<Button>(R.id.btn_home)
+        val btnReplay = dialog.findViewById<Button>(R.id.btn_play)
+        val playerName = dialog.findViewById<TextView>(R.id.tv_player_name)
 
         playerName.text = name
         btnHome.setOnClickListener {
-            dialouge.dismiss()
+            dialog.dismiss()
             findNavController().navigate(R.id.action_gameFragment_to_homeScreenFragment)
         }
-        btn_rePlay.setOnClickListener {
-            dialouge.dismiss()
+        btnReplay.setOnClickListener {
+            dialog.dismiss()
             binding.btnRestart.callOnClick()
         }
-
-        dialouge.show()
-
+        dialog.show()
     }
 
     private suspend fun leaveDialog() {
         delay(300)
-        val dialouge = Dialog(requireContext(), R.style.dialoge)
-        dialouge.setContentView(R.layout.leave_game_dialog_layout)
-        dialouge.setCancelable(false)
-        val btnHome = dialouge.findViewById<Button>(R.id.btn_home)
-        val posetiveBtn = dialouge.findViewById<Button>(R.id.btn_yes)
+        val dialog = Dialog(requireContext(), R.style.dialoge)
+        dialog.setContentView(R.layout.leave_game_dialog_layout)
+        dialog.setCancelable(false)
+        val btnHome = dialog.findViewById<Button>(R.id.btn_home)
+        val posetiveBtn = dialog.findViewById<Button>(R.id.btn_yes)
+        val closeBtn = dialog.findViewById<ImageView>(R.id.iv_close)
         btnHome.setOnClickListener {
-            dialouge.dismiss()
             findNavController().navigate(R.id.action_gameFragment_to_homeScreenFragment)
+            dialog.dismiss()
         }
         posetiveBtn.setOnClickListener {
-            dialouge.dismiss()
             runBlocking {
-                binding.ticTacToeBoard.saveGame(true)
+                binding.ticTacToeBoard.saveGame(true, args.player1, args.player2)
             }
             findNavController().navigate(R.id.action_gameFragment_to_homeScreenFragment)
+            dialog.dismiss()
         }
 
-        dialouge.show()
+        closeBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
 
@@ -227,7 +234,6 @@ class GameFragment : Fragment() {
         }
 
     }
-    
 
 
 }

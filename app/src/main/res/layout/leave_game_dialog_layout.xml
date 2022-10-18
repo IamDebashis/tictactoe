@@ -7,7 +7,11 @@
     android:background="@drawable/rounded_backgound"
     android:fitsSystemWindows="true"
     android:layout_gravity="center_horizontal"
-    android:padding="20dp">
+    android:paddingEnd="20dp"
+    android:paddingStart="20dp"
+    android:paddingBottom="20dp"
+    android:paddingTop="10dp"
+    >
 
     <TextView
         android:id="@+id/tv_draw"
@@ -16,20 +20,19 @@
         android:text="Save the Game ?"
         android:textAppearance="?attr/textAppearanceHeadline5"
         android:textColor="@color/yellow"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_hand_shake"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginTop="16dp"
         android:background="@color/lightBlue"
-        app:contentPadding="40dp"
+        app:contentPadding="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_player_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_details"
         app:shapeAppearanceOverlay="@style/circleImageView"
         app:srcCompat="@drawable/save" />
 
@@ -68,13 +71,28 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_hand_shake" />
 
     <TextView
-        android:id="@+id/tv_player_name"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        android:textColor="@color/green"
+        android:id="@+id/tv_details"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="Do you want to save the game for play latter."
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/save_game"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="@color/green"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_draw" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="-5dp"
+        android:background="@color/red"
+        android:padding="5dp"
+        app:shapeAppearanceOverlay="@style/circleImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_round_close"
+        app:tint="@color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

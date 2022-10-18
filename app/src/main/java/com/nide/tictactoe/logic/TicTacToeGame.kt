@@ -6,7 +6,8 @@ class TicTacToeGame {
 
     var gameBoard = Array(3) { IntArray(3) { 0 } }
     var player: Int = 1
-    private var gameScore = IntArray(2) { 0 }
+    var gameScore = IntArray(2) { 0 }
+
     var winner = -1
         private set
     var isGamePlay = true
@@ -73,11 +74,15 @@ class TicTacToeGame {
         if (winRow || winCol || winDig || winRevDig) {
             gameScore[if (player == 1) 0 else 1]++
             winType =
-                intArrayOf(row-1, col-1, if (winRow) 1 else if (winCol) 2 else if (winDig) 3 else 4)
+                intArrayOf(
+                    row - 1,
+                    col - 1,
+                    if (winRow) 1 else if (winCol) 2 else if (winDig) 3 else 4
+                )
             onGameScoreUp?.invoke(gameScore)
             return player
         } else {
-            var draw =0
+            var draw = 0
             for (i in gameBoard.indices) {
                 for (j in 0 until 3) {
                     if (gameBoard[i][j] == 0) {
@@ -87,7 +92,7 @@ class TicTacToeGame {
                 }
             }
             Log.i("TicTac", "checkWin: $draw")
-            return if (draw == 0 )
+            return if (draw == 0)
                 0
             else -1
         }
@@ -98,7 +103,7 @@ class TicTacToeGame {
         gameBoard = Array(3) { IntArray(3) { 0 } }
         winType = IntArray(3) { -1 }
         isGamePlay = true
-        winner =-1
+        winner = -1
         player = 1
     }
 
